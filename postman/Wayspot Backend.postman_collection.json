@@ -146,7 +146,8 @@
           "name": "Obtener reseñas",
           "request": {
             "method": "GET",
-            "url": { "raw": "http://localhost:3000/reviews", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews"] }
+            "url": { "raw": "http://localhost:3000/reviews", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews"] },
+            "description": "Obtiene las reseñas registradas."
           },
           "response": []
         },
@@ -193,6 +194,29 @@
             "method": "DELETE",
             "url": { "raw": "http://localhost:3000/reviews/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1"] },
             "description": "Cambia el 1 por el ID de la reseña que quieres eliminar."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener comentarios de una reseña",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/reviews/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1", "comments"] },
+            "description": "Primero crea una reseña y sustituye el 1 por el ID devuelto. Cada comentario incluye el usuario autor."
+          },
+          "response": []
+        },
+        {
+          "name": "Publicar comentario en una reseña",
+          "request": {
+            "method": "POST",
+            "url": { "raw": "http://localhost:3000/reviews/1/comments", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1", "comments"] },
+            "description": "Primero crea una reseña y sustituye el 1 por su ID. El usuario 1 debe existir.",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Estoy de acuerdo con esta reseña\",\n  \"userId\": 1\n}",
+              "options": { "raw": { "language": "json" } }
+            }
           },
           "response": []
         }
