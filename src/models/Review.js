@@ -23,6 +23,10 @@ export const Review = sequelize.define(
             type: DataTypes.STRING,
             allowNull: false
         },
+        reviewDate: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
         userId: {
             type: DataTypes.INTEGER,
             allowNull: false,

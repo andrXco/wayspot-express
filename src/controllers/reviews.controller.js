@@ -27,14 +27,17 @@ export const getReviewById = async (req, res) => {
 
 export const getReviewsByPlaceId = async (req, res) => {
     try {
-        const place = await Place.findByPk(req.params.placeId);
+        const place = /^\d+$/.test(req.params.placeId)
+            ? await Place.findByPk(req.params.placeId)
+            : await Place.findOne({ where: { slug: req.params.placeId } });
 
         if (!place) {
             return res.status(404).json({ error: "Lugar no encontrado" });
         }
 
         const reviews = await Review.findAll({
-            where: { placeId: req.params.placeId }
+            where: { placeId: place.id },
+            include: [{ model: User, as: "user", attributes: ["id", "name", "username", "avatarUrl"] }]
         });
 
         return res.json(reviews);

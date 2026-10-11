@@ -88,7 +88,7 @@
           "request": {
             "method": "GET",
             "url": { "raw": "http://localhost:3000/places/1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["places", "1"] },
-            "description": "El lugar 1 viene en los datos iniciales. Puedes cambiar el ID por otro."
+            "description": "Acepta el ID numérico de la API o un slug del catálogo, por ejemplo cerro_monserrate. La respuesta incluye duración, precio, altitud y conteo de reseñas."
           },
           "response": []
         },
@@ -97,7 +97,7 @@
           "request": {
             "method": "GET",
             "url": { "raw": "http://localhost:3000/places/1/reviews", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["places", "1", "reviews"] },
-            "description": "Trae todas las reseñas del lugar con ID 1. Cambia el ID por otro lugar existente."
+            "description": "Acepta el ID numérico o slug de un lugar. Las reseñas iniciales incluyen autor y fecha."
           },
           "response": []
         },
@@ -108,7 +108,7 @@
             "url": { "raw": "http://localhost:3000/places", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["places"] },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Parque Tayrona\",\n  \"category\": \"Naturaleza\",\n  \"location\": \"Santa Marta, Colombia\",\n  \"rating\": 4.8,\n  \"imageUrl\": null,\n  \"description\": \"Parque natural en la costa Caribe\"\n}",
+              "raw": "{\n  \"slug\": \"parque_tayrona\",\n  \"title\": \"Parque Tayrona\",\n  \"category\": \"Naturaleza\",\n  \"location\": \"Magdalena, Colombia\",\n  \"rating\": 4.8,\n  \"imageUrl\": \"https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=1000&auto=format&fit=crop\",\n  \"description\": \"Un parque natural donde la Sierra Nevada se encuentra con el mar Caribe.\",\n  \"duration\": \"Todo el día\",\n  \"price\": \"Entrada con costo\",\n  \"altitude\": \"0–900 m\",\n  \"reviewCount\": 1164\n}",
               "options": { "raw": { "language": "json" } }
             }
           },
@@ -122,7 +122,7 @@
             "description": "Cambia el 4 por el ID del lugar que quieres actualizar.",
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Parque Tayrona\",\n  \"category\": \"Naturaleza\",\n  \"location\": \"Santa Marta, Colombia\",\n  \"rating\": 4.9,\n  \"imageUrl\": null,\n  \"description\": \"Parque natural con playas y senderos\"\n}",
+              "raw": "{\n  \"title\": \"Parque Tayrona\",\n  \"category\": \"Naturaleza\",\n  \"location\": \"Magdalena, Colombia\",\n  \"rating\": 4.9,\n  \"imageUrl\": \"https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?q=80&w=1000&auto=format&fit=crop\",\n  \"description\": \"Un parque natural con playas y senderos.\",\n  \"duration\": \"Todo el día\",\n  \"price\": \"Entrada con costo\",\n  \"altitude\": \"0–900 m\",\n  \"reviewCount\": 1164\n}",
               "options": { "raw": { "language": "json" } }
             }
           },
