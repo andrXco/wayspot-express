@@ -9,6 +9,11 @@ export const Place = sequelize.define(
             primaryKey: true,
             autoIncrement: true
         },
+        slug: {
+            type: DataTypes.STRING,
+            allowNull: true,
+            unique: true
+        },
         title: {
             type: DataTypes.STRING,
             allowNull: false
@@ -32,6 +37,23 @@ export const Place = sequelize.define(
         description: {
             type: DataTypes.STRING,
             allowNull: true
+        },
+        duration: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        price: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        altitude: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        reviewCount: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            defaultValue: 0
         }
     },
     {

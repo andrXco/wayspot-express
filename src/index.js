@@ -11,13 +11,13 @@ async function main() {
 
         setupRelations();
 
-        await sequelize.sync();
+        await sequelize.sync({ alter: true });
         console.log("Database synchronized successfully.");
 
         await loadInitialUsers();
         await loadInitialPlaces();
 
-        app.listen(3000);
+        app.listen(3000, "0.0.0.0");
         console.log("Server listening on port 3000");
     } catch (error) {
         console.error("Unable to connect to the database:", error);

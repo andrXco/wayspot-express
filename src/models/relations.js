@@ -1,6 +1,7 @@
 import { User } from "./User.js";
 import { Place } from "./Place.js";
 import { Review } from "./Review.js";
+import { Comment } from "./Comment.js";
 
 export function setupRelations() {
 
@@ -27,4 +28,9 @@ export function setupRelations() {
         foreignKey: "placeId",
         as: "place"
     });
+
+    User.hasMany(Comment, { foreignKey: "userId", as: "comments", onDelete: "CASCADE" });
+    Comment.belongsTo(User, { foreignKey: "userId", as: "user" });
+    Review.hasMany(Comment, { foreignKey: "reviewId", as: "comments", onDelete: "CASCADE" });
+    Comment.belongsTo(Review, { foreignKey: "reviewId", as: "review" });
 }

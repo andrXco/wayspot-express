@@ -27,14 +27,17 @@ export const getReviewById = async (req, res) => {
 
 export const getReviewsByPlaceId = async (req, res) => {
     try {
-        const place = await Place.findByPk(req.params.placeId);
+        const place = /^\d+$/.test(req.params.placeId)
+            ? await Place.findByPk(req.params.placeId)
+            : await Place.findOne({ where: { slug: req.params.placeId } });
 
         if (!place) {
             return res.status(404).json({ error: "Lugar no encontrado" });
         }
 
         const reviews = await Review.findAll({
-            where: { placeId: req.params.placeId }
+            where: { placeId: place.id },
+            include: [{ model: User, as: "user", attributes: ["id", "name", "username", "avatarUrl"] }]
         });
 
         return res.json(reviews);
@@ -108,7 +111,7 @@ export const deleteReview = async (req, res) => {
         }
 
         await review.destroy();
-        return res.status(204).send();
+        return res.status(200).json({ message: "Reseña eliminada" });
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }

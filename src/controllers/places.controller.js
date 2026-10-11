@@ -11,7 +11,9 @@ export const getPlaces = async (req, res) => {
 
 export const getPlaceById = async (req, res) => {
     try {
-        const place = await Place.findByPk(req.params.id);
+        const place = /^\d+$/.test(req.params.id)
+            ? await Place.findByPk(req.params.id)
+            : await Place.findOne({ where: { slug: req.params.id } });
 
         if (!place) {
             return res.status(404).json({ error: "Lugar no encontrado" });
