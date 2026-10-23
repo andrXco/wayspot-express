@@ -15,7 +15,8 @@ export const getCommentsByReviewId = async (req, res) => {
                 model: User,
                 as: "user",
                 attributes: ["id", "name", "username", "avatarUrl"]
-            }]
+            }],
+            order: [["createdAt", "ASC"], ["id", "ASC"]]
         });
         return res.json(comments);
     } catch (error) {
