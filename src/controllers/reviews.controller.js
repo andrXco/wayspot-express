@@ -1,11 +1,59 @@
+import { Op } from "sequelize";
 import { Review } from "../models/Review.js";
+import { ReviewLike } from "../models/ReviewLike.js";
+import { UserFollow } from "../models/UserFollow.js";
 import { User } from "../models/User.js";
 import { Place } from "../models/Place.js";
 
+const reviewUserInclude = {
+    model: User,
+    as: "user",
+    attributes: ["id", "name", "username", "avatarUrl"]
+};
+
+const parseCurrentUserId = (req, res) => {
+    if (req.query.userId === undefined) return null;
+    const userId = Number(req.query.userId);
+    if (!Number.isInteger(userId) || userId < 1) {
+        res.status(400).json({ error: "userId debe ser un entero positivo" });
+        return undefined;
+    }
+    return userId;
+};
+
+const withLikeSummaries = async (reviews, currentUserId) => {
+    const rows = reviews.map(review => review.toJSON());
+    if (rows.length === 0) return rows;
+
+    const likes = await ReviewLike.findAll({
+        where: { reviewId: { [Op.in]: rows.map(review => review.id) } },
+        attributes: ["reviewId", "userId"]
+    });
+    const summaries = new Map();
+    for (const like of likes) {
+        const summary = summaries.get(like.reviewId) ?? { likesCount: 0, liked: false };
+        summary.likesCount += 1;
+        if (currentUserId !== null && like.userId === currentUserId) summary.liked = true;
+        summaries.set(like.reviewId, summary);
+    }
+
+    return rows.map(review => ({
+        ...review,
+        likesCount: summaries.get(review.id)?.likesCount ?? 0,
+        liked: summaries.get(review.id)?.liked ?? false
+    }));
+};
+
 export const getReviews = async (req, res) => {
     try {
-        const reviews = await Review.findAll();
-        return res.json(reviews);
+        const currentUserId = parseCurrentUserId(req, res);
+        if (currentUserId === undefined) return;
+
+        const reviews = await Review.findAll({
+            include: [reviewUserInclude],
+            order: [["id", "DESC"]]
+        });
+        return res.json(await withLikeSummaries(reviews, currentUserId));
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -13,13 +61,19 @@ export const getReviews = async (req, res) => {
 
 export const getReviewById = async (req, res) => {
     try {
-        const review = await Review.findByPk(req.params.id);
+        const currentUserId = parseCurrentUserId(req, res);
+        if (currentUserId === undefined) return;
+
+        const review = await Review.findByPk(req.params.id, {
+            include: [reviewUserInclude]
+        });
 
         if (!review) {
             return res.status(404).json({ error: "Reseña no encontrada" });
         }
 
-        return res.json(review);
+        const [enrichedReview] = await withLikeSummaries([review], currentUserId);
+        return res.json(enrichedReview);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -27,6 +81,9 @@ export const getReviewById = async (req, res) => {
 
 export const getReviewsByPlaceId = async (req, res) => {
     try {
+        const currentUserId = parseCurrentUserId(req, res);
+        if (currentUserId === undefined) return;
+
         const place = /^\d+$/.test(req.params.placeId)
             ? await Place.findByPk(req.params.placeId)
             : await Place.findOne({ where: { slug: req.params.placeId } });
@@ -37,10 +94,11 @@ export const getReviewsByPlaceId = async (req, res) => {
 
         const reviews = await Review.findAll({
             where: { placeId: place.id },
-            include: [{ model: User, as: "user", attributes: ["id", "name", "username", "avatarUrl"] }]
+            include: [reviewUserInclude],
+            order: [["id", "DESC"]]
         });
 
-        return res.json(reviews);
+        return res.json(await withLikeSummaries(reviews, currentUserId));
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -48,6 +106,9 @@ export const getReviewsByPlaceId = async (req, res) => {
 
 export const getReviewsByUserId = async (req, res) => {
     try {
+        const currentUserId = parseCurrentUserId(req, res);
+        if (currentUserId === undefined) return;
+
         const user = await User.findByPk(req.params.userId);
 
         if (!user) {
@@ -55,10 +116,42 @@ export const getReviewsByUserId = async (req, res) => {
         }
 
         const reviews = await Review.findAll({
-            where: { userId: req.params.userId }
+            where: { userId: req.params.userId },
+            include: [reviewUserInclude],
+            order: [["id", "DESC"]]
         });
 
-        return res.json(reviews);
+        return res.json(await withLikeSummaries(reviews, currentUserId));
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
+};
+
+export const getFollowingFeed = async (req, res) => {
+    try {
+        const currentUserId = Number(req.params.userId);
+        if (!Number.isInteger(currentUserId) || currentUserId < 1) {
+            return res.status(400).json({ error: "El ID debe ser un entero positivo" });
+        }
+
+        const user = await User.findByPk(currentUserId);
+        if (!user) {
+            return res.status(404).json({ error: "Usuario no encontrado" });
+        }
+
+        const follows = await UserFollow.findAll({
+            where: { followerId: currentUserId },
+            attributes: ["followedId"]
+        });
+        const followedUserIds = follows.map(follow => follow.followedId);
+        if (followedUserIds.length === 0) return res.json([]);
+
+        const reviews = await Review.findAll({
+            where: { userId: { [Op.in]: followedUserIds } },
+            include: [reviewUserInclude],
+            order: [["id", "DESC"]]
+        });
+        return res.json(await withLikeSummaries(reviews, currentUserId));
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -74,7 +167,9 @@ export const createReview = async (req, res) => {
         }
 
         const newReview = await Review.create(req.body);
-        return res.status(201).json(newReview);
+        const reviewWithUser = await Review.findByPk(newReview.id, { include: [reviewUserInclude] });
+        const [enrichedReview] = await withLikeSummaries([reviewWithUser], null);
+        return res.status(201).json(enrichedReview);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }
@@ -96,7 +191,9 @@ export const updateReview = async (req, res) => {
         }
 
         await review.update(req.body);
-        return res.json(review);
+        const reviewWithUser = await Review.findByPk(review.id, { include: [reviewUserInclude] });
+        const [enrichedReview] = await withLikeSummaries([reviewWithUser], null);
+        return res.json(enrichedReview);
     } catch (error) {
         return res.status(500).json({ error: error.message });
     }

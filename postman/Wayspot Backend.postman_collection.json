@@ -221,6 +221,121 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "Funciones sociales",
+      "item": [
+        {
+          "name": "Listar seguidores",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/followers", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "followers"] },
+            "description": "El usuario 1 debe existir; devuelve los perfiles que siguen a ese usuario."
+          },
+          "response": []
+        },
+        {
+          "name": "Contar seguidores",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/followers/count", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "followers", "count"] },
+            "description": "Devuelve el total de seguidores del usuario 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Listar seguidos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/following", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following"] },
+            "description": "El usuario 1 debe existir; devuelve los perfiles que sigue."
+          },
+          "response": []
+        },
+        {
+          "name": "Obtener IDs de seguidos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/following/ids", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "ids"] },
+            "description": "Devuelve los IDs SQL de los usuarios seguidos por el usuario 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Contar seguidos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/following/count", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "count"] },
+            "description": "Devuelve el total de usuarios que sigue el usuario 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar seguimiento",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/following/2", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "2"] },
+            "description": "Devuelve following=true/false. Ambos usuarios deben existir."
+          },
+          "response": []
+        },
+        {
+          "name": "Seguir usuario",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "http://localhost:3000/users/1/following/2", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "2"] },
+            "description": "Crea la relación de forma idempotente. Ambos usuarios deben existir; no permite auto-seguimiento."
+          },
+          "response": []
+        },
+        {
+          "name": "Dejar de seguir usuario",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "http://localhost:3000/users/1/following/2", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "2"] },
+            "description": "Elimina la relación; repetir la solicitud responde sin error."
+          },
+          "response": []
+        },
+        {
+          "name": "Feed de seguidos",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/users/1/following/reviews", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["users", "1", "following", "reviews"] },
+            "description": "Devuelve reseñas de las cuentas que sigue el usuario 1, ordenadas por ID descendente."
+          },
+          "response": []
+        },
+        {
+          "name": "Consultar likes de una reseña",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "http://localhost:3000/reviews/1/likes?userId=1", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1", "likes"], "query": [{ "key": "userId", "value": "1" }] },
+            "description": "Devuelve likesCount y liked. La reseña 1 y el usuario 1 deben existir."
+          },
+          "response": []
+        },
+        {
+          "name": "Dar like a una reseña",
+          "request": {
+            "method": "PUT",
+            "url": { "raw": "http://localhost:3000/reviews/1/likes", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1", "likes"] },
+            "description": "La reseña 1 y el usuario 1 deben existir. Repetir la solicitud no duplica el like.",
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": 1\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        },
+        {
+          "name": "Quitar like de una reseña",
+          "request": {
+            "method": "DELETE",
+            "url": { "raw": "http://localhost:3000/reviews/1/likes", "protocol": "http", "host": ["localhost"], "port": "3000", "path": ["reviews", "1", "likes"] },
+            "description": "La reseña 1 y el usuario 1 deben existir. El conteo se devuelve actualizado.",
+            "body": { "mode": "raw", "raw": "{\n  \"userId\": 1\n}", "options": { "raw": { "language": "json" } } }
+          },
+          "response": []
+        }
+      ]
     }
   ]
 }
